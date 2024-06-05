@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: recipe-app
+spec:
+  selector:
+    matchLabels:
+      app: recipe-app
+  serviceName: "recipe-app"
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: recipe-app
+    spec:
+      containers:
+      - name: recipe-app
+        image: quay.io/rocrisp/recipe:v3
+        ports:
+        - containerPort: 5000
+          name: http
+        volumeMounts:
+        - name: recipe-db-storage
+          mountPath: /database
+        env:
+        - name: DATABASE_PATH
+          value: /database/recipes.db
+      volumes:
+      - name: recipe-db-storage
+        persistentVolumeClaim:
+          claimName: recipe-db-pvc
