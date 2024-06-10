@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-    <title>Recipe App</title>
+    <title>Recipe List</title>
 </head>
 <body>
     <div class="container mt-5">
@@ -22,12 +22,12 @@
             <tbody>
                 {% for recipe in recipes %}
                 <tr>
-                    <td>{{ recipe[1] }}</td>
-                    <td>{{ recipe[2] }}</td>
-                    <td>{{ recipe[3] }}</td>
+                    <td>{{ recipe.title }}</td>
+                    <td>{{ recipe.ingredients }}</td>
+                    <td>{{ recipe.instructions }}</td>
                     <td>
-                        <a href="{{ url_for('get_recipe_by_id', recipe_id=recipe[0]) }}" class="btn btn-secondary">Edit</a>
-                        <a href="{{ url_for('delete_recipe', recipe_id=recipe[0]) }}" class="btn btn-danger">Delete</a>
+                        <a href="{{ url_for('get_recipe_by_id', recipe_id=recipe.id) }}" class="btn btn-secondary">Edit</a>
+                        <a href="{{ url_for('delete_recipe', recipe_id=recipe.id) }}" class="btn btn-danger">Delete</a>
                     </td>
                 </tr>
                 {% endfor %}

@@ -25,6 +25,7 @@ spec:
         env:
         - name: DATABASE_PATH
           value: /database/recipes.db
+      
       volumes:
       - name: recipe-db-storage
         persistentVolumeClaim:

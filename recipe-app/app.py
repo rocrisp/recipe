@@ -1,5 +1,3 @@
-# app.py
-
 from flask import Flask, request, jsonify, render_template, redirect, url_for
 from models import create_connection
 from datetime import datetime
@@ -11,7 +9,7 @@ def index():
     with create_connection() as conn:
         cursor = conn.cursor()
         cursor.execute('SELECT * FROM recipes')
-        recipes = cursor.fetchall()
+        recipes = cursor.fetchall()  # This should return a list of dictionaries
     return render_template('index.html', recipes=recipes)
 
 @app.route('/recipes/<int:recipe_id>', methods=['GET', 'POST'])
@@ -24,15 +22,15 @@ def get_recipe_by_id(recipe_id):
             cursor = conn.cursor()
             cursor.execute('''
                 UPDATE recipes
-                SET title = ?, ingredients = ?, instructions = ?, updated_at = ?
-                WHERE id = ?
+                SET title = %s, ingredients = %s, instructions = %s, updated_at = %s
+                WHERE id = %s
             ''', (title, ingredients, instructions, datetime.now(), recipe_id))
             conn.commit()
         return redirect(url_for('index'))
     else:
         with create_connection() as conn:
             cursor = conn.cursor()
-            cursor.execute('SELECT * FROM recipes WHERE id = ?', (recipe_id,))
+            cursor.execute('SELECT * FROM recipes WHERE id = %s', (recipe_id,))
             recipe = cursor.fetchone()
         return render_template('edit_recipe.html', recipe=recipe)
 
@@ -43,12 +41,12 @@ def add_recipe():
         ingredients = request.form['ingredients']
         instructions = request.form['instructions']
         with create_connection() as conn:
-            cursor = conn.cursor()
-            cursor.execute('''
-                INSERT INTO recipes (title, ingredients, instructions, created_at, updated_at)
-                VALUES (?, ?, ?, ?, ?)
-            ''', (title, ingredients, instructions, datetime.now(), datetime.now()))
-            conn.commit()
+            with conn.cursor() as cursor:
+                cursor.execute('''
+                    INSERT INTO recipes (title, ingredients, instructions, created_at, updated_at)
+                    VALUES (%s, %s, %s, %s, %s)
+                ''', (title, ingredients, instructions, datetime.now(), datetime.now()))
+                conn.commit()
         return redirect(url_for('index'))
     return render_template('add_recipe.html')
 
@@ -56,7 +54,7 @@ def add_recipe():
 def delete_recipe(recipe_id):
     with create_connection() as conn:
         cursor = conn.cursor()
-        cursor.execute('DELETE FROM recipes WHERE id = ?', (recipe_id,))
+        cursor.execute('DELETE FROM recipes WHERE id = %s', (recipe_id,))
         conn.commit()
     return redirect(url_for('index'))
 

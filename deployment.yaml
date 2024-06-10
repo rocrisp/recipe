@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: recipe-app
+spec:
+  selector:
+    matchLabels:
+      app: recipe-app
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: recipe-app
+    spec:
+      containers:
+      - name: recipe-app
+        image: quay.io/rocrisp/recipe:v13
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 5000
+          name: http
+        env:
+        - name: DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: mysql-config
+              key: DB_HOST
+        - name: DB_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: mysql-config
+              key: DB_PORT
+        - name: DB_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: mysql-config
+              key: MYSQL_DATABASE
+        - name: DB_USER
+          value: recipeuser
+        - name: DB_PASSWORD
+          valueFrom:
+            configMapKeyRef:
+              name: mysql-config
+              key: MYSQL_PASSWORD
